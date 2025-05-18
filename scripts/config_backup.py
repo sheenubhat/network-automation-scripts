@@ -7,6 +7,8 @@ import yaml
 import logging
 import argparse
 import sys
+from netmiko import ConnectHandler
+from netmiko.exceptions import NetmikoTimeoutException, NetmikoAuthenticationException
 
 def loadDevices(devices_file="data/devices.yaml"):
     """Loads device information from a YAML file.
@@ -108,7 +110,7 @@ def main():
     devices_file = args.devices
     backup_dir = args.backup_dir
 
-    devices = load_devices(devices_file)
+    devices = loadDevices(devices_file)
     if devices is None:
         logging.error("Failed to load devices. Exiting.")
         sys.exit(1)
