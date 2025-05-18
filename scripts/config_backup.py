@@ -60,14 +60,14 @@ def backup_config(device, backup_dir):
             f"Authentication failed for {device['name']} ({device['host']})"
         )
         return False
-    except netmiko.NetmikoSSHException as e:
-        logging.error(f"SSH error with {device['name']} ({device['host']}): {e}")
-        return False
-    except Exception as e:
-        logging.error(
-            f"An error occurred while backing up {device['name']} ({device['host']}): {e}"
-        )
-        return False  # Ensure a return value in all error cases
+    # except netmiko.NetmikoSSHException as e:
+    #     logging.error(f"SSH error with {device['name']} ({device['host']}): {e}")
+    #     return False
+    # except Exception as e:
+    #     logging.error(
+    #         f"An error occurred while backing up {device['name']} ({device['host']}): {e}"
+    #     )
+    #     return False  # Ensure a return value in all error cases
 
 
 
