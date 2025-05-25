@@ -7,8 +7,8 @@ import yaml # type: ignore
 import logging
 import argparse
 import sys
-from netmiko import ConnectHandler # type: ignore
-from netmiko.exceptions import NetmikoTimeoutException, NetmikoAuthenticationException # type: ignore
+# from netmiko import ConnectHandler # type: ignore - Not strictly needed if using netmiko.ConnectHandler
+from netmiko.exceptions import NetmikoTimeoutException, NetmikoAuthenticationException, NetmikoBaseException # type: ignore # Added NetmikoBaseException
 
 def loadDevices(devices_file="data/devices.yaml"):
     """Loads device information from a YAML file.
@@ -20,8 +20,9 @@ def loadDevices(devices_file="data/devices.yaml"):
 
     try:
         with open(devices_file, "r") as f:
-            devices_data=yaml.safe_load(f)     #use safe_load
-            return devices_data.get("devices", [])   #handles if "devices" key doesn't exist
+            devices_data = yaml.safe_load(f)    #use safe_load
+            # This line already correctly extracts from the 'devices' key
+            return devices_data.get("devices", [])  #handles if "devices" key doesn't exist
     except FileNotFoundError:
         logging.error(f"Error: {devices_file} not found.")
         return None
@@ -29,18 +30,20 @@ def loadDevices(devices_file="data/devices.yaml"):
         logging.error(f"Error parsing YAML file: {e}")
         return None
     except Exception as e:
-        logging.error(f"An expected error occurred: {e}")
+        logging.error(f"An unexpected error occurred: {e}") # Corrected typo from "An expected"
         return None
-    
+
 def backup_config(device, backup_dir):
     """Backs up the configuration of a single network device using Netmiko.
 
     Args:
-        device (dict): A dictionary containing device information (host, username, password, type).
+        device (dict): A dictionary containing device information (host, username, password, device_type).
         backup_dir (str): The directory to save the backup to.
     """
     try:
         logging.info(f"Connecting to {device['name']} ({device['host']})")
+        # The KeyError 'device_type' is because it expects 'device_type', but YAML uses 'type'
+        # This will be resolved when you update your devices.yaml file
         with netmiko.ConnectHandler(**device) as net_connect:
             net_connect.enable()
             config = net_connect.send_command("show running-config")
@@ -52,23 +55,22 @@ def backup_config(device, backup_dir):
                 f.write(config)
             logging.info(f"Configuration backed up for {device['name']} to {backup_file}")
         return True # Indicate success
-    except netmiko.NetmikoTimeoutException:
+    except NetmikoTimeoutException: # This is correctly imported now
         logging.error(f"Timeout connecting to {device['name']} ({device['host']})")
         return False
-    except netmiko.NetmikoAuthenticationException:
+    except NetmikoAuthenticationException: # This is correctly imported now
         logging.error(
             f"Authentication failed for {device['name']} ({device['host']})"
         )
         return False
-    except netmiko.NetmikoSSHException as e:
-        logging.error(f"SSH error with {device['name']} ({device['host']}): {e}")
+    except NetmikoBaseException as e: # Changed from NetmikoSSHException to NetmikoBaseException
+        logging.error(f"Netmiko error with {device['name']} ({device['host']}): {e}") # Changed 'SSH error' to 'Netmiko error'
         return False
     except Exception as e:
         logging.error(
             f"An error occurred while backing up {device['name']} ({device['host']}): {e}"
         )
-        return False  # Ensure a return value in all error cases
-
+        return False   # Ensure a return value in all error cases
 
 
 def main():
@@ -120,10 +122,9 @@ def main():
     for device in devices:
         backup_successful = backup_config(device, backup_dir)
         if not backup_successful:
-            logging.warning(f"Backup failed for {device['name']}.  Continuing...")
+            logging.warning(f"Backup failed for {device['name']}. Continuing...")
     logging.info("Backup process completed.")
 
 
 if __name__ == "__main__":
     main()
-    
