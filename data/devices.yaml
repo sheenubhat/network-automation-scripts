@@ -3,17 +3,17 @@
 # adding dummy Cisco devices
 devices:  # Add this top-level "devices" key
   - name: Router1
-    type: cisco_ios
-    host: 192.168.1.1
+    device_type: cisco_ios
+    host: 192.168.0.1
     username: admin
     password: password
   - name: Switch1
-    type: cisco_ios
-    host: 192.168.1.2
+    device_type: cisco_ios
+    host: 192.168.0.2
     username: admin
     password: password
   - name: Router2
-    type: cisco_ios
-    host: 192.168.1.3
+    device_type: cisco_ios
+    host: 192.168.0.3
     username: admin
     password: password
