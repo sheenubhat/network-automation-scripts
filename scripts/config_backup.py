@@ -1,14 +1,14 @@
 # incorporating Netmiko and error handling
 
-import netmiko
+import netmiko # type: ignore
 import datetime
 import os
-import yaml
+import yaml # type: ignore
 import logging
 import argparse
 import sys
-from netmiko import ConnectHandler
-from netmiko.exceptions import NetmikoTimeoutException, NetmikoAuthenticationException
+from netmiko import ConnectHandler # type: ignore
+from netmiko.exceptions import NetmikoTimeoutException, NetmikoAuthenticationException # type: ignore
 
 def loadDevices(devices_file="data/devices.yaml"):
     """Loads device information from a YAML file.
