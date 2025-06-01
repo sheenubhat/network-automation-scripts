@@ -5,15 +5,15 @@ devices:  # Add this top-level "devices" key
   - name: Router1
     device_type: cisco_ios
     host: 192.168.0.1
-    username: admin
-    password: password
+    username: admin_user
+    password: password123
   - name: Switch1
     device_type: cisco_ios
     host: 192.168.0.2
-    username: admin
-    password: password
+    username: admin_user
+    password: password123
   - name: Router2
     device_type: cisco_ios
     host: 192.168.0.3
-    username: admin
-    password: password
+    username: admin_user
+    password: password123
